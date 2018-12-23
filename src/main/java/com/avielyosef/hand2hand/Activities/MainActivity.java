@@ -52,6 +52,10 @@ public class MainActivity extends AppCompatActivity
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
     private ListView allAds;
 
+    /**
+     * onCreate
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,6 +89,9 @@ public class MainActivity extends AppCompatActivity
         setListenerOnAds();
     }
 
+    /**
+     * Set listener on the Ads, to get all the Ads shown on our MainActivity
+     */
     private void setListenerOnAds(){
         final DatabaseReference mRef = database.getReference("allAds/");
         mRef.addValueEventListener(new ValueEventListener() {
@@ -159,6 +166,9 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
+    /**
+     * Set listener to check if the user is paid or not, to update the UI accordingly
+     */
     private void setListenerOnPaidUser(){
         final FirebaseUser user = mAuth.getCurrentUser();
         if (user != null){
@@ -186,6 +196,9 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * onStart
+     */
     @Override
     public void onStart(){
         super.onStart();
@@ -193,6 +206,10 @@ public class MainActivity extends AppCompatActivity
         updateUI(user);
     }
 
+    /**
+     * Update the UI
+     * @param user
+     */
     private void updateUI(FirebaseUser user){
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         Menu menu = navigationView.getMenu();
@@ -253,6 +270,11 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    /**
+     * Handle action bar items.
+     * @param item
+     * @return true if OK
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -272,6 +294,11 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Handle navigation view items.
+     * @param item
+     * @return true if OK
+     */
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -321,6 +348,9 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    /**
+     * SignOut by click
+     */
     private void signOut(){
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null){

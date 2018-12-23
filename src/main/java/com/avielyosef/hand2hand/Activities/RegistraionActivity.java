@@ -73,6 +73,10 @@ public class RegistraionActivity extends AppCompatActivity implements LoaderCall
     private View mProgressView;
     private View mLoginFormView;
 
+    /**
+     * onCreate
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -169,7 +173,7 @@ public class RegistraionActivity extends AppCompatActivity implements LoaderCall
 
 
     /**
-     * Attempts to sign in or register the account specified by the login form.
+     * Attempts to register the account specified by the login form.
      * If there are form errors (invalid email, missing fields, etc.), the
      * errors are presented and no actual login attempt is made.
      */
@@ -293,6 +297,10 @@ public class RegistraionActivity extends AppCompatActivity implements LoaderCall
         }
     }
 
+    /**
+     * update the UI
+     * @param user
+     */
     private void updateUI(FirebaseUser user){
         if(user!=null){
             Intent mIntent = new Intent(this,LoginActivity.class);
@@ -307,17 +315,13 @@ public class RegistraionActivity extends AppCompatActivity implements LoaderCall
         }
     }
 
+
+    /* <-- form validation help methods -->*/
     private boolean isEmailValid(String email) {
         return email.contains("@") && email.contains(".");
     }
-
-    private boolean isPasswordValid(String password) {
-        return password.length() > 5;
-    }
-
-    private boolean isPasswordValid(String password,String password2) {
-        return password.equals(password2);
-    }
+    private boolean isPasswordValid(String password) { return password.length() > 5; }
+    private boolean isPasswordValid(String password,String password2) { return password.equals(password2); }
     private boolean isIdValid(String id){
         return android.text.TextUtils.isDigitsOnly(id) && id.length() == 9;
     }

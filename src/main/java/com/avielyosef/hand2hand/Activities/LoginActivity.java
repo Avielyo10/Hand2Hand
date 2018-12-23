@@ -68,6 +68,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private View mProgressView;
     private View mLoginFormView;
 
+    /**
+     * onCreate
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -152,13 +156,16 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
     }
 
+    /**
+     * In case the user has no account -> register
+     */
     private void attemptRegistration(){
         Intent mIntent = new Intent(LoginActivity.this, RegistraionActivity.class);
         startActivity(mIntent);
     }
 
     /**
-     * Attempts to sign in or register the account specified by the login form.
+     * Attempts to sign in the account specified by the login form.
      * If there are form errors (invalid email, missing fields, etc.), the
      * errors are presented and no actual login attempt is made.
      */
@@ -224,6 +231,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
     }
 
+    /**
+     * update the UI
+     * @param user
+     */
     private void updateUI(FirebaseUser user){
         if(user!=null){
             Intent mIntent = new Intent(this,MainActivity.class);
@@ -239,10 +250,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
     }
 
+    /* <-- form validation help methods -->*/
     private boolean isEmailValid(String email) {
         return email.contains("@") && email.contains(".");
     }
-
     private boolean isPasswordValid(String password) {
         return password.length() > 5;
     }

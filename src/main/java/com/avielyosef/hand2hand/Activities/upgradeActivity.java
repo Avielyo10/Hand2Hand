@@ -45,6 +45,10 @@ public class upgradeActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
 
+    /**
+     * onCreate
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,6 +84,10 @@ public class upgradeActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * validate the fields
+     * @return if the fields are valid
+     */
     private boolean validateFields() {
         setErrorForRadioGroup.setError(null);
 
@@ -137,6 +145,10 @@ public class upgradeActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * update the user data from regular user to premium one
+     * @param user
+     */
     private void updateUserData(FirebaseUser user) {
         if (user != null) {
             final DatabaseReference myRef = database.getReference("allUsers/"+user.getUid());
@@ -157,6 +169,10 @@ public class upgradeActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * update the Ads for this user to premium Ads
+     * @param user
+     */
     private void updateAllAds(FirebaseUser user) {
         if (user != null) {
             DatabaseReference myRef = database.getReference("allAds/");
@@ -177,6 +193,11 @@ public class upgradeActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * calculate the date the premium period ends
+     * @param numOfDays
+     * @return
+     */
     private String getTheLastPaidDay(int numOfDays){
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         Calendar cal = Calendar.getInstance();

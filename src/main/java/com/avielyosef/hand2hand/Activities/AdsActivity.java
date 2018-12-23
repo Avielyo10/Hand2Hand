@@ -37,6 +37,11 @@ public class AdsActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     FirebaseDatabase database = FirebaseDatabase.getInstance();
+
+    /**
+     * onCreate
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,6 +91,11 @@ public class AdsActivity extends AppCompatActivity {
             }
         });
     }
+
+    /**
+     * validate the fields
+     * @return if the fields are valid
+     */
     private boolean validateFields(){
         etTitle.setError(null);
         etDescription.setError(null);
@@ -135,6 +145,7 @@ public class AdsActivity extends AppCompatActivity {
         }
         return !cancel;
     }
+
     /**
      * Shows the progress UI and hides the login form.
      */
@@ -171,7 +182,9 @@ public class AdsActivity extends AppCompatActivity {
         }
     }
 
-    public String randomAdId() {
-        return UUID.randomUUID().toString();
-    }
+    /**
+     * Create uuid for Ads to prevent override
+     * @return
+     */
+    public String randomAdId() { return UUID.randomUUID().toString(); }
 }
