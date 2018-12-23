@@ -6,7 +6,6 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -16,20 +15,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.avielyosef.hand2hand.Util.Ad;
-import com.avielyosef.hand2hand.Util.CustomAdapter;
-import com.avielyosef.hand2hand.DB.MyDB;
 import com.avielyosef.hand2hand.R;
-import com.avielyosef.hand2hand.Util.PaidUser;
-import com.avielyosef.hand2hand.Util.RegUser;
-import com.avielyosef.hand2hand.Util.User;
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -37,11 +29,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-
-import java.util.ArrayList;
-import java.util.Iterator;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -97,65 +85,62 @@ public class MainActivity extends AppCompatActivity
         mRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot ad : dataSnapshot.getChildren()){
-                    adapter = new FirebaseListAdapter<Ad>(
-                            MainActivity.this,
-                            Ad.class,
-                            R.layout.custom_layout,
-                            mRef) {//TODO sort!
-                        @Override
-                        protected void populateView(View view, Ad myAd, int position) {
-                               String title = getItem(position).getTitle();
-                               String description = getItem(position).getDescription();
-                               int price = getItem(position).getPrice();
-                               String sPrice = String.valueOf(price)+" NIS";
-                               Boolean isPaid = getItem(position).isPaid();
+                adapter = new FirebaseListAdapter<Ad>(
+                        MainActivity.this,
+                        Ad.class,
+                        R.layout.custom_layout,
+                        mRef) {//TODO sort!
+                    @Override
+                    protected void populateView(View view, Ad myAd, int position) {
+                        String title = getItem(position).getTitle();
+                        String description = getItem(position).getDescription();
+                        int price = getItem(position).getPrice();
+                        String sPrice = String.valueOf(price)+" NIS";
+                        Boolean isPaid = getItem(position).isPaid();
 
-                                TextView tvTitle =  (TextView)view.findViewById(R.id.customTitle);
-                                TextView tvDescription =  (TextView)view.findViewById(R.id.customDescription);
-                                TextView tvPrice =  (TextView)view.findViewById(R.id.customPrice);
-                                ImageView customStar = (ImageView)view.findViewById(R.id.customStar);
-                                ImageView customPhone = (ImageView)view.findViewById(R.id.customCall);
-                                ImageView customMail = (ImageView)view.findViewById(R.id.customMail);
-                                ImageView customResize = (ImageView)view.findViewById(R.id.customSeeAll);
+                        TextView tvTitle =  (TextView)view.findViewById(R.id.customTitle);
+                        TextView tvDescription =  (TextView)view.findViewById(R.id.customDescription);
+                        TextView tvPrice =  (TextView)view.findViewById(R.id.customPrice);
+                        ImageView customStar = (ImageView)view.findViewById(R.id.customStar);
+                        ImageView customPhone = (ImageView)view.findViewById(R.id.customCall);
+                        ImageView customMail = (ImageView)view.findViewById(R.id.customMail);
+                        ImageView customResize = (ImageView)view.findViewById(R.id.customSeeAll);
 
-                                tvTitle.setText(title);
-                                tvDescription.setText(description);
-                                tvPrice.setText(sPrice);
-
-                                if(isPaid){
-                                    try{
-                                        customStar.setVisibility(View.VISIBLE);
-                                    }catch (Exception e){}
-                                }else{
-                                    try{
-                                        customStar.setVisibility(View.GONE);
-                                    }catch (Exception e){}
-                                }
-                                customMail.setOnClickListener(new View.OnClickListener() {
+                        tvTitle.setText(title);
+                        tvDescription.setText(description);
+                        tvPrice.setText(sPrice);
+                        if(isPaid){
+                            try{
+                                customStar.setVisibility(View.VISIBLE);
+                            }catch (Exception e){}
+                        }else{
+                            try{
+                                customStar.setVisibility(View.GONE);
+                            }catch (Exception e){}
+                        }
+                        customMail.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
                                         Toast.makeText(MainActivity.this, "Email - not available",
                                                 Toast.LENGTH_SHORT).show();
                                     }
                                 });
-                                customPhone.setOnClickListener(new View.OnClickListener() {
+                        customPhone.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
                                         Toast.makeText(MainActivity.this, "Phone - not available",
                                                 Toast.LENGTH_SHORT).show();
                                     }
                                 });
-                                customResize.setOnClickListener(new View.OnClickListener() {
+                        customResize.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
                                         Toast.makeText(MainActivity.this, "Resize - not available",
                                                 Toast.LENGTH_SHORT).show();
                                     }
                                 });
-                            }
-                        };
                     }
+                };
                 allAds.setAdapter(adapter);
             }
 
@@ -319,7 +304,7 @@ public class MainActivity extends AppCompatActivity
             startActivity(mIntent);
         } else if (id == R.id.nav_upgrade) {
             //show pop-up
-            Intent mIntent = new Intent(this, upgradeActivity.class);
+            Intent mIntent = new Intent(this, UpgradeActivity.class);
             startActivity(mIntent);
         } else if (id == R.id.nav_manage) {
             // Handle the manage Ads action

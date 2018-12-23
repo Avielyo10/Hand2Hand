@@ -32,7 +32,7 @@
             android:label="@string/title_activity_registraion" />
         <activity android:name=".Activities.AdsActivity"
             android:label="Create new Ad"></activity>
-        <activity android:name=".Activities.upgradeActivity"
+        <activity android:name=".Activities.UpgradeActivity"
             android:label="Upgrade"></activity>
     </application>
 

@@ -6,10 +6,8 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Intent;
 import android.os.Build;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
@@ -18,10 +16,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.avielyosef.hand2hand.R;
-import com.avielyosef.hand2hand.Util.PaidUser;
-import com.avielyosef.hand2hand.Util.RegUser;
-import com.avielyosef.hand2hand.Util.User;
-import com.google.firebase.FirebaseError;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -35,7 +29,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 
-public class upgradeActivity extends AppCompatActivity {
+public class UpgradeActivity extends AppCompatActivity {
     private View upgradeView;
     private View mProgressView;
     private RadioGroup radioGroup;
@@ -74,11 +68,11 @@ public class upgradeActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (validateFields()) {
                     showProgress(true);
-                    Toast.makeText(upgradeActivity.this, "Upgrading...",
+                    Toast.makeText(UpgradeActivity.this, "Upgrading...",
                             Toast.LENGTH_SHORT).show();
                     updateUserData(mAuth.getCurrentUser());
                     updateAllAds(mAuth.getCurrentUser());
-                    startActivity(new Intent(upgradeActivity.this, MainActivity.class));
+                    startActivity(new Intent(UpgradeActivity.this, MainActivity.class));
                 }
             }
         });
