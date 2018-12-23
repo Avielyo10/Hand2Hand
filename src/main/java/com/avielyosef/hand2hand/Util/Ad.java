@@ -11,17 +11,17 @@ public class Ad {
     private String category;
     private int price;
     private ImageView img;
-    private boolean isPaid;
+    private boolean isNotPaid;
     private String uid;
 
     public Ad(){}
-    public Ad(String title, String description, String category, int price, ImageView img, boolean isPaid, String uid) {
+    public Ad(String title, String description, String category, int price, ImageView img, boolean isNotPaid, String uid) {
         this.title = title;
         this.description = description;
         this.category = category;
         this.price = price;
         this.img = img;
-        this.isPaid = isPaid;
+        this.isNotPaid = isNotPaid;
         this.uid = uid;
     }
 
@@ -61,9 +61,9 @@ public class Ad {
         this.img = img;
     }
 
-    public boolean isPaid() { return isPaid; }
+    public boolean isNotPaid() { return isNotPaid; }
 
-    public void setPaid(boolean paid) { isPaid = paid; }
+    public void setNotPaid(boolean notPaid) { isNotPaid = notPaid; }
 
     public String getUid() { return uid; }
 

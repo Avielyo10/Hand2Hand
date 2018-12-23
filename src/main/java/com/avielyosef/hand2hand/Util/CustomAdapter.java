@@ -30,7 +30,7 @@ public class CustomAdapter extends ArrayAdapter<Ad> {
         String description = getItem(position).getDescription();
         int price = getItem(position).getPrice();
         String sPrice = String.valueOf(price)+" NIS";
-        Boolean isPaid = getItem(position).isPaid();
+        Boolean isPaid = getItem(position).isNotPaid();
 
         LayoutInflater inflater = LayoutInflater.from(mContext);
         convertView = inflater.inflate(mResource,parent,false);

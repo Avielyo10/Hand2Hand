@@ -83,7 +83,7 @@ public class AdsActivity extends AppCompatActivity {
                                 selection,
                                 Integer.valueOf(etPrice.getText().toString()),
                                 null,
-                                MainActivity.PAID_USER,
+                                !MainActivity.PAID_USER,
                                 user.getUid()));
                         startActivity(new Intent(AdsActivity.this, MainActivity.class));
                     }

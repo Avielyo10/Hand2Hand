@@ -176,7 +176,7 @@ public class UpgradeActivity extends AppCompatActivity {
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             for (DataSnapshot ad : dataSnapshot.getChildren()) {
                                 DatabaseReference newRef = database.getReference("allAds/"+ad.getKey());
-                                newRef.child("paid").setValue(true);
+                                newRef.child("notPaid").setValue(false);
                             }
                         }
                         @Override

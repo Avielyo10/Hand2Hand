@@ -89,14 +89,14 @@ public class MainActivity extends AppCompatActivity
                         MainActivity.this,
                         Ad.class,
                         R.layout.custom_layout,
-                        mRef) {//TODO sort!
+                        mRef.orderByChild("notPaid")) {
                     @Override
                     protected void populateView(View view, Ad myAd, int position) {
                         String title = getItem(position).getTitle();
                         String description = getItem(position).getDescription();
                         int price = getItem(position).getPrice();
                         String sPrice = String.valueOf(price)+" NIS";
-                        Boolean isPaid = getItem(position).isPaid();
+                        Boolean isPaid = getItem(position).isNotPaid();
 
                         TextView tvTitle =  (TextView)view.findViewById(R.id.customTitle);
                         TextView tvDescription =  (TextView)view.findViewById(R.id.customDescription);
@@ -109,7 +109,7 @@ public class MainActivity extends AppCompatActivity
                         tvTitle.setText(title);
                         tvDescription.setText(description);
                         tvPrice.setText(sPrice);
-                        if(isPaid){
+                        if(!isPaid){
                             try{
                                 customStar.setVisibility(View.VISIBLE);
                             }catch (Exception e){}
