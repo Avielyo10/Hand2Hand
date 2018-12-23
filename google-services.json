@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "333824162311",
+    "firebase_url": "https://hand2hand-aae5c.firebaseio.com",
+    "project_id": "hand2hand-aae5c",
+    "storage_bucket": "hand2hand-aae5c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:333824162311:android:0f7cae5e2a2aa37a",
+        "android_client_info": {
+          "package_name": "com.avielyosef.hand2hand.Activities"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "333824162311-l00dkmmc3f1lputb3i7rhtpivls3oeg2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.avielyosef.hand2hand.Activities",
+            "certificate_hash": "4bb889c330db3865c46c2382bf5f2e6067d7f2dd"
+          }
+        },
+        {
+          "client_id": "333824162311-htp4obl0duhjobq2mdugeof90esc369v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBtr0zTJ7v_NhLJ_cdrPO41odK7NnYi-Pc"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "333824162311-htp4obl0duhjobq2mdugeof90esc369v.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
