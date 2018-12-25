@@ -1,12 +1,16 @@
 package com.avielyosef.hand2hand.Activities;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -23,8 +27,6 @@ import android.widget.Toast;
 
 import com.avielyosef.hand2hand.Util.Ad;
 import com.avielyosef.hand2hand.R;
-import com.avielyosef.hand2hand.Util.RegUser;
-import com.avielyosef.hand2hand.Util.User;
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -94,20 +96,19 @@ public class MainActivity extends AppCompatActivity
                         R.layout.custom_layout,
                         mRef.orderByChild("notPaid")) {
                     @Override
-                    protected void populateView(View view, Ad myAd, final int position) {
-                        String title = getItem(position).getTitle();
-                        String description = getItem(position).getDescription();
+                    protected void populateView(final View view, Ad myAd, final int position) {
+                        final String title = getItem(position).getTitle();
+                        final String description = getItem(position).getDescription();
                         int price = getItem(position).getPrice();
-                        String sPrice = String.valueOf(price)+" NIS";
+                        final String sPrice = String.valueOf(price)+" NIS";
                         Boolean isPaid = getItem(position).isNotPaid();
 
                         TextView tvTitle =  (TextView)view.findViewById(R.id.customTitle);
                         TextView tvDescription =  (TextView)view.findViewById(R.id.customDescription);
                         TextView tvPrice =  (TextView)view.findViewById(R.id.customPrice);
                         ImageView customStar = (ImageView)view.findViewById(R.id.customStar);
-                        ImageView customPhone = (ImageView)view.findViewById(R.id.customCall);
-                        ImageView customMail = (ImageView)view.findViewById(R.id.customMail);
-                        ImageView customResize = (ImageView)view.findViewById(R.id.customSeeAll);
+                        ImageView customResize = (ImageView)view.findViewById(R.id.custom_resize);
+
 
                         tvTitle.setText(title);
                         tvDescription.setText(description);
@@ -121,40 +122,61 @@ public class MainActivity extends AppCompatActivity
                                 customStar.setVisibility(View.GONE);
                             }catch (Exception e){}
                         }
-                        customMail.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        FirebaseUser user = mAuth.getCurrentUser();
-                                        if(user != null){
-                                            String userMail = getItem(position).getUserMail();
-                                            if(!userMail.equals(user.getEmail())){
-                                                Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
-                                                        "mailto",userMail, null));
-                                                emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Your Ad at Hand2Hand");
-                                                emailIntent.putExtra(Intent.EXTRA_TEXT, "Hi, I'm interested in" +
-                                                        " your item, is it still available?");
-                                                startActivity(Intent.createChooser(emailIntent, "Send Email"));
-                                            }else{
-                                                Toast.makeText(MainActivity.this, "You can't send an Email " +
-                                                                "to yourself",
-                                                        Toast.LENGTH_SHORT).show();
-                                            }
-                                        }
-                                    }
-                                });
-                        customPhone.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        Intent mIntent = new Intent(Intent.ACTION_DIAL);
-                                        mIntent.setData(Uri.parse("tel:"+getItem(position).getUserPhoneNum()));
-                                        startActivity(mIntent);
-                                    }
-                                });
                         customResize.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
-                                        Toast.makeText(MainActivity.this, "Resize - not available",
-                                                Toast.LENGTH_SHORT).show();
+                                        LayoutInflater factory = LayoutInflater.from(MainActivity.this);
+                                        final View mView = factory.inflate(R.layout.resize_layout, null);
+                                        AlertDialog.Builder builder;
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                            builder = new AlertDialog.Builder(MainActivity.this, android.R.style.Theme_DeviceDefault_Light_Dialog_Alert);
+                                        } else {
+                                            builder = new AlertDialog.Builder(MainActivity.this);
+                                        }
+                                        builder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                                    public void onClick(DialogInterface dialog, int which) {onStart(); }})
+                                                .setView(mView)
+                                                .show();
+
+                                        TextView tvTitle1 =  (TextView)mView.findViewById(R.id.resize_title);
+                                        TextView tvDescription1 =  (TextView)mView.findViewById(R.id.resize_description);
+                                        TextView tvPrice1 =  (TextView)mView.findViewById(R.id.resize_price);
+                                        ImageView phoneCall = (ImageView)mView.findViewById(R.id.resize_phonecall);
+                                        ImageView sendEmail = (ImageView)mView.findViewById(R.id.resize_email);
+
+                                        tvTitle1.setText(title);
+                                        tvDescription1.setText(description);
+                                        tvPrice1.setText(sPrice);
+                                        sendEmail.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                FirebaseUser user = mAuth.getCurrentUser();
+                                                if(user != null){
+                                                    String userMail = getItem(position).getUserMail();
+                                                    if(!userMail.equals(user.getEmail())){
+                                                        Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
+                                                                "mailto",userMail, null));
+                                                        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Your Ad at Hand2Hand");
+                                                        emailIntent.putExtra(Intent.EXTRA_TEXT, "Hi, I'm interested in" +
+                                                                " your item, is it still available?");
+                                                        startActivity(Intent.createChooser(emailIntent, "Send Email"));
+                                                    }else{
+                                                        Toast.makeText(MainActivity.this, "You can't send an Email " +
+                                                                        "to yourself",
+                                                                Toast.LENGTH_SHORT).show();
+                                                    }
+                                                }
+                                            }
+                                        });
+//
+                                        phoneCall.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                Intent mIntent = new Intent(Intent.ACTION_DIAL);
+                                                mIntent.setData(Uri.parse("tel:"+getItem(position).getUserPhoneNum()));
+                                                startActivity(mIntent);
+                                            }
+                                        });
                                     }
                                 });
                     }
