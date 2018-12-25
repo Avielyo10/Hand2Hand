@@ -7,9 +7,15 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,6 +36,7 @@ public class MyAdsManagementActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
     private ListView myAds;
+    public String selection;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,7 +75,39 @@ public class MyAdsManagementActivity extends AppCompatActivity {
                             myAdsEdit.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    //TODO start conversation window
+                                    LayoutInflater factory = LayoutInflater.from(MyAdsManagementActivity.this);
+                                    final View mView = factory.inflate(R.layout.ads_management_layout, null);
+                                    AlertDialog.Builder builder;
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                        builder = new AlertDialog.Builder(MyAdsManagementActivity.this, android.R.style.Theme_DeviceDefault_Light_Dialog_Alert);
+                                    } else {
+                                        builder = new AlertDialog.Builder(MyAdsManagementActivity.this);
+                                    }
+                                    builder.setNegativeButton("Update Ad", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            final EditText etTitle = (EditText) mView.findViewById(R.id.ads_man_title);
+                                            final EditText etDescription = (EditText)mView.findViewById(R.id.ads_man_description);
+                                            final EditText etPrice = (EditText) mView.findViewById(R.id.ads_man_price);
+                                            RadioGroup mRadioGroup = (RadioGroup) mView.findViewById(R.id.ads_man_radio_group);
+                                            mRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+                                                @Override
+                                                public void onCheckedChanged(RadioGroup group, int checkedId) {
+                                                    RadioButton rb = (RadioButton) mView.findViewById(checkedId);
+                                                    selection = rb.getText().toString();
+                                                }
+                                            });
+                                            if(validateFields(etPrice)){
+                                                String adId = getItem(position).getAdId();
+                                                Toast.makeText(MyAdsManagementActivity.this, "Updating Ad..",
+                                                        Toast.LENGTH_SHORT).show();
+                                                saveTheRightFields(adId,
+                                                        etTitle.getText().toString(),
+                                                        etDescription.getText().toString(),
+                                                        etPrice.getText().toString(),selection);
+                                            }
+                                        }})
+                                            .setView(mView)
+                                            .show();
                                 }
                             });
                             myAdsTrash.setOnClickListener(new View.OnClickListener() {
@@ -111,5 +150,45 @@ public class MyAdsManagementActivity extends AppCompatActivity {
 
             }
         });
+    }
+    /**
+     * validate the fields
+     * @return if the fields are valid
+     */
+    private boolean validateFields(EditText etPrice){
+        etPrice.setError(null);
+
+        String price = etPrice.getText().toString();
+        boolean cancel = false;
+        View focusView = null;
+
+        // Check for a valid price.
+        if(!android.text.TextUtils.isDigitsOnly(price)){
+            etPrice.setError("Please use digits only!");
+            focusView = etPrice;
+            cancel = true;
+        }
+
+        if (cancel) {
+            // There was an error; focus the first
+            // form field with an error.
+            focusView.requestFocus();
+        }
+        return !cancel;
+    }
+
+    private void saveTheRightFields(String adId, String title,
+                                    String description, String price,
+                                    String selection){
+        final DatabaseReference mRef = database.getReference("allAds/"+adId);
+
+        if(!TextUtils.isEmpty(title)) mRef.child("title").setValue(title);
+
+        if(!TextUtils.isEmpty(description)) mRef.child("description").setValue(description);
+
+        if(!TextUtils.isEmpty(price)) mRef.child("price").setValue(Integer.valueOf(price));
+
+        if(!TextUtils.isEmpty(selection)) mRef.child("category").setValue(selection);
+
     }
 }

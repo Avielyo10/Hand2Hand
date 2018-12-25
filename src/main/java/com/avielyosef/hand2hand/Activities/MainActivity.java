@@ -101,6 +101,7 @@ public class MainActivity extends AppCompatActivity
                         final String description = getItem(position).getDescription();
                         int price = getItem(position).getPrice();
                         final String sPrice = String.valueOf(price)+" NIS";
+                        final String username = getItem(position).getUsername();
                         Boolean isPaid = getItem(position).isNotPaid();
 
                         TextView tvTitle =  (TextView)view.findViewById(R.id.customTitle);
@@ -134,19 +135,21 @@ public class MainActivity extends AppCompatActivity
                                             builder = new AlertDialog.Builder(MainActivity.this);
                                         }
                                         builder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                                                    public void onClick(DialogInterface dialog, int which) {onStart(); }})
+                                                    public void onClick(DialogInterface dialog, int which) {}})
                                                 .setView(mView)
                                                 .show();
 
                                         TextView tvTitle1 =  (TextView)mView.findViewById(R.id.resize_title);
                                         TextView tvDescription1 =  (TextView)mView.findViewById(R.id.resize_description);
                                         TextView tvPrice1 =  (TextView)mView.findViewById(R.id.resize_price);
+                                        TextView tvUsername = (TextView)mView.findViewById(R.id.resize_username);
                                         ImageView phoneCall = (ImageView)mView.findViewById(R.id.resize_phonecall);
                                         ImageView sendEmail = (ImageView)mView.findViewById(R.id.resize_email);
 
                                         tvTitle1.setText(title);
                                         tvDescription1.setText(description);
                                         tvPrice1.setText(sPrice);
+                                        tvUsername.setText(username);
                                         sendEmail.setOnClickListener(new View.OnClickListener() {
                                             @Override
                                             public void onClick(View v) {

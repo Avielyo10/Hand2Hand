@@ -61,7 +61,6 @@ public class AdsActivity extends AppCompatActivity {
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                int id=group.getCheckedRadioButtonId();
                 RadioButton rb=(RadioButton) findViewById(checkedId);
                 selection = rb.getText().toString();
             }
@@ -95,7 +94,8 @@ public class AdsActivity extends AppCompatActivity {
                                         dataSnapshot.getValue().toString(),
                                         user.getEmail(),
                                         adId,
-                                        user.getUid()));
+                                        user.getUid(),
+                                        user.getDisplayName()));
                             }
 
                             @Override

@@ -16,11 +16,12 @@ public class Ad {
     private String userMail;
     private String adId;
     private String uid;
+    private String username;
 
     public Ad(){}
 
     public Ad(String title, String description, String category, int price, ImageView img,
-              boolean isNotPaid, String userPhoneNum, String userMail, String adId, String uid) {
+              boolean isNotPaid, String userPhoneNum, String userMail, String adId, String uid, String username) {
         this.title = title;
         this.description = description;
         this.category = category;
@@ -31,6 +32,7 @@ public class Ad {
         this.userMail = userMail;
         this.adId = adId;
         this.uid = uid;
+        this.username = username;
     }
 
     public String getTitle() {
@@ -88,6 +90,10 @@ public class Ad {
     public String getUid() { return uid; }
 
     public void setUid(String uid) { this.uid = uid; }
+
+    public String getUsername() { return username; }
+
+    public void setUsername(String username) { this.username = username; }
 
     //    @NonNull
     @Override
