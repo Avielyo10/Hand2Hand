@@ -30,10 +30,18 @@
         <activity
             android:name=".Activities.RegistraionActivity"
             android:label="@string/title_activity_registraion" />
-        <activity android:name=".Activities.AdsActivity"
-            android:label="Create new Ad"></activity>
-        <activity android:name=".Activities.UpgradeActivity"
-            android:label="Upgrade"></activity>
+        <activity
+            android:name=".Activities.AdsActivity"
+            android:label="Create new Ad" />
+        <activity
+            android:name=".Activities.UpgradeActivity"
+            android:label="Upgrade" />
+        <activity
+            android:name=".Activities.SettingsActivity"
+            android:label="@string/title_activity_settings"></activity>
+        <activity
+            android:name=".Activities.MyAdsManagementActivity"
+            android:label="Ads Management"></activity>
     </application>
 
 </manifest>

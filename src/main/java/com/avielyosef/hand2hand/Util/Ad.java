@@ -12,16 +12,24 @@ public class Ad {
     private int price;
     private ImageView img;
     private boolean isNotPaid;
+    private String userPhoneNum;
+    private String userMail;
+    private String adId;
     private String uid;
 
     public Ad(){}
-    public Ad(String title, String description, String category, int price, ImageView img, boolean isNotPaid, String uid) {
+
+    public Ad(String title, String description, String category, int price, ImageView img,
+              boolean isNotPaid, String userPhoneNum, String userMail, String adId, String uid) {
         this.title = title;
         this.description = description;
         this.category = category;
         this.price = price;
         this.img = img;
         this.isNotPaid = isNotPaid;
+        this.userPhoneNum = userPhoneNum;
+        this.userMail = userMail;
+        this.adId = adId;
         this.uid = uid;
     }
 
@@ -64,6 +72,18 @@ public class Ad {
     public boolean isNotPaid() { return isNotPaid; }
 
     public void setNotPaid(boolean notPaid) { isNotPaid = notPaid; }
+
+    public String getAdId() { return adId; }
+
+    public void setAdId(String adId) { this.adId = adId; }
+
+    public String getUserPhoneNum() { return userPhoneNum; }
+
+    public void setUserPhoneNum(String userPhoneNum) { this.userPhoneNum = userPhoneNum; }
+
+    public String getUserMail() { return userMail; }
+
+    public void setUserMail(String userMail) { this.userMail = userMail; }
 
     public String getUid() { return uid; }
 

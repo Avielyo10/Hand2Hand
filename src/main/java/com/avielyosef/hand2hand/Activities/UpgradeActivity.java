@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
@@ -167,7 +168,7 @@ public class UpgradeActivity extends AppCompatActivity {
      * update the Ads for this user to premium Ads
      * @param user
      */
-    private void updateAllAds(FirebaseUser user) {
+    private void updateAllAds(final FirebaseUser user) {
         if (user != null) {
             DatabaseReference myRef = database.getReference("allAds/");
             myRef.addListenerForSingleValueEvent(
@@ -176,7 +177,9 @@ public class UpgradeActivity extends AppCompatActivity {
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             for (DataSnapshot ad : dataSnapshot.getChildren()) {
                                 DatabaseReference newRef = database.getReference("allAds/"+ad.getKey());
-                                newRef.child("notPaid").setValue(false);
+                                if(ad.child("uid").getValue().equals(user.getUid())){
+                                    newRef.child("notPaid").setValue(false);
+                                }
                             }
                         }
                         @Override

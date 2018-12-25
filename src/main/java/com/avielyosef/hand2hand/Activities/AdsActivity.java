@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Intent;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -20,8 +21,11 @@ import com.avielyosef.hand2hand.R;
 import com.avielyosef.hand2hand.Util.Ad;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.UUID;
 
@@ -71,20 +75,35 @@ public class AdsActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if(validateFields()){
                     showProgress(true);
-                    String adId = randomAdId();
+                    final String adId = randomAdId();
                     Toast.makeText(AdsActivity.this, "Ad created successfully!",
                             Toast.LENGTH_SHORT).show();
                     // Write an Ad to the database
-                    FirebaseUser user = mAuth.getCurrentUser();
+                    final FirebaseUser user = mAuth.getCurrentUser();
                     if(user != null){
-                        DatabaseReference myRef = database.getReference("allAds/"+adId);
-                        myRef.setValue(new Ad(etTitle.getText().toString(),
-                                etDescription.getText().toString(),
-                                selection,
-                                Integer.valueOf(etPrice.getText().toString()),
-                                null,
-                                !MainActivity.PAID_USER,
-                                user.getUid()));
+                        final DatabaseReference userRef = database.getReference("allUsers/"+user.getUid()+"/phoneNum");
+                        userRef.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                DatabaseReference myRef = database.getReference("allAds/"+adId);
+                                myRef.setValue(new Ad(etTitle.getText().toString(),
+                                        etDescription.getText().toString(),
+                                        selection,
+                                        Integer.valueOf(etPrice.getText().toString()),
+                                        null,
+                                        !MainActivity.PAID_USER,
+                                        dataSnapshot.getValue().toString(),
+                                        user.getEmail(),
+                                        adId,
+                                        user.getUid()));
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+
                         startActivity(new Intent(AdsActivity.this, MainActivity.class));
                     }
                 }

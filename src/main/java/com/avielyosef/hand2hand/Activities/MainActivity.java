@@ -1,6 +1,7 @@
 package com.avielyosef.hand2hand.Activities;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -22,6 +23,8 @@ import android.widget.Toast;
 
 import com.avielyosef.hand2hand.Util.Ad;
 import com.avielyosef.hand2hand.R;
+import com.avielyosef.hand2hand.Util.RegUser;
+import com.avielyosef.hand2hand.Util.User;
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -91,7 +94,7 @@ public class MainActivity extends AppCompatActivity
                         R.layout.custom_layout,
                         mRef.orderByChild("notPaid")) {
                     @Override
-                    protected void populateView(View view, Ad myAd, int position) {
+                    protected void populateView(View view, Ad myAd, final int position) {
                         String title = getItem(position).getTitle();
                         String description = getItem(position).getDescription();
                         int price = getItem(position).getPrice();
@@ -121,15 +124,30 @@ public class MainActivity extends AppCompatActivity
                         customMail.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
-                                        Toast.makeText(MainActivity.this, "Email - not available",
-                                                Toast.LENGTH_SHORT).show();
+                                        FirebaseUser user = mAuth.getCurrentUser();
+                                        if(user != null){
+                                            String userMail = getItem(position).getUserMail();
+                                            if(!userMail.equals(user.getEmail())){
+                                                Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
+                                                        "mailto",userMail, null));
+                                                emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Your Ad at Hand2Hand");
+                                                emailIntent.putExtra(Intent.EXTRA_TEXT, "Hi, I'm interested in" +
+                                                        " your item, is it still available?");
+                                                startActivity(Intent.createChooser(emailIntent, "Send Email"));
+                                            }else{
+                                                Toast.makeText(MainActivity.this, "You can't send an Email " +
+                                                                "to yourself",
+                                                        Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
                                     }
                                 });
                         customPhone.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
-                                        Toast.makeText(MainActivity.this, "Phone - not available",
-                                                Toast.LENGTH_SHORT).show();
+                                        Intent mIntent = new Intent(Intent.ACTION_DIAL);
+                                        mIntent.setData(Uri.parse("tel:"+getItem(position).getUserPhoneNum()));
+                                        startActivity(mIntent);
                                     }
                                 });
                         customResize.setOnClickListener(new View.OnClickListener() {
@@ -266,13 +284,20 @@ public class MainActivity extends AppCompatActivity
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
+        FirebaseUser user = mAuth.getCurrentUser();
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_refresh) {
             Toast.makeText(MainActivity.this, "Refreshing...",
                     Toast.LENGTH_SHORT).show();
-            FirebaseUser user = mAuth.getCurrentUser();
             updateUI(user);
+            return true;
+        }else if(id == R.id.action_settings){
+            if(user != null){
+                startActivity(new Intent(MainActivity.this, SettingsActivity.class));
+            }else{
+                Toast.makeText(MainActivity.this, "You need to login first.",
+                        Toast.LENGTH_SHORT).show();
+            }
             return true;
         }
 
@@ -292,25 +317,21 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_login) {
             // Handle the login action
-            Intent mIntent = new Intent(MainActivity.this, LoginActivity.class);
-            startActivity(mIntent);
-
+            startActivity(new Intent(MainActivity.this, LoginActivity.class));
         } else if (id == R.id.nav_logout) {
             // Handle the logout action
             signOut();
         } else if (id == R.id.nav_ad) {
             // Handle the user Ads action
-            Intent mIntent = new Intent(this, AdsActivity.class);
-            startActivity(mIntent);
+            startActivity(new Intent(this, AdsActivity.class));
         } else if (id == R.id.nav_upgrade) {
-            //show pop-up
-            Intent mIntent = new Intent(this, UpgradeActivity.class);
-            startActivity(mIntent);
+            // Handle the user upgrade action
+            startActivity(new Intent(this, UpgradeActivity.class));
         } else if (id == R.id.nav_manage) {
             // Handle the manage Ads action
             FirebaseUser user = mAuth.getCurrentUser();
             if(user!=null){
-                //TODO manage ads
+                startActivity(new Intent(MainActivity.this,MyAdsManagementActivity.class));
             }else{
                 Toast.makeText(MainActivity.this, "You need to login first.",
                         Toast.LENGTH_SHORT).show();

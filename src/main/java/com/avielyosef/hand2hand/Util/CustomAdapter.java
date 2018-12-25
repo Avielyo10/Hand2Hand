@@ -57,7 +57,6 @@ public class CustomAdapter extends ArrayAdapter<Ad> {
 //        clickAdBtn.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View v) {
-//                //TODO show the Ad in a bigger screen
 //            }
 //        });
         return convertView;
