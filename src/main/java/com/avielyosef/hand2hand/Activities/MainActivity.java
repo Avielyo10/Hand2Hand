@@ -1,5 +1,6 @@
 package com.avielyosef.hand2hand.Activities;
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -27,7 +28,11 @@ import android.widget.Toast;
 
 import com.avielyosef.hand2hand.Util.Ad;
 import com.avielyosef.hand2hand.R;
+import com.avielyosef.hand2hand.Util.GlideApp;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.firebase.ui.database.FirebaseListAdapter;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -35,14 +40,19 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    public static final int GET_FROM_GALLERY = 1;
     public static boolean PAID_USER;
     private FirebaseListAdapter<Ad> adapter;
     private FirebaseAuth mAuth;
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
+    private StorageReference mStorageRef;
     private ListView allAds;
 
     /**
@@ -238,14 +248,14 @@ public class MainActivity extends AppCompatActivity
      * Update the UI
      * @param user
      */
-    private void updateUI(FirebaseUser user){
+    private void updateUI(final FirebaseUser user){
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         Menu menu = navigationView.getMenu();
         View headerView = navigationView.getHeaderView(0);
         TextView tvUsername = (TextView) headerView.findViewById(R.id.nav_header_name);
         TextView tvEmail = (TextView) headerView.findViewById(R.id.nav_header_email);
-        ImageView premuimStar = (ImageView) findViewById(R.id.nav_header_star);
-
+        ImageView premiumStar = (ImageView) findViewById(R.id.nav_header_star);
+        final ImageView profilePicture = (ImageView) headerView.findViewById(R.id.profile_pic);
         if (user != null){//user is logged in
             menu.findItem(R.id.nav_login).setVisible(false);
             menu.findItem(R.id.nav_logout).setVisible(true);
@@ -254,17 +264,34 @@ public class MainActivity extends AppCompatActivity
             tvUsername.setText("Hello "+ user.getDisplayName() + " !");
             tvEmail.setText(user.getEmail());
             try{
-                premuimStar.setVisibility(View.GONE);
+                premiumStar.setVisibility(View.GONE);
             }catch (Exception e){
                 Log.e("MainActivityUpdateUI",e.getMessage());
             }
             if(PAID_USER){
                 menu.findItem(R.id.nav_upgrade).setVisible(false);
                 try{
-                    premuimStar.setVisibility(View.VISIBLE);
+                    premiumStar.setVisibility(View.VISIBLE);
                 }catch (Exception e){
                     Log.e("MainActivityUpdateUI",e.getMessage());
                 }
+            }
+            profilePicture.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mAuth.getCurrentUser() != null){
+                        startActivityForResult(new Intent(Intent.ACTION_PICK,
+                                        android.provider.MediaStore.Images.Media.INTERNAL_CONTENT_URI),
+                                GET_FROM_GALLERY);
+                    }
+                }
+            });
+            mStorageRef = FirebaseStorage.getInstance().getReference(user.getUid()+"/profile.jpg");
+            if(mStorageRef != null){
+                GlideApp.with(this)
+                        .load(mStorageRef)
+                        .diskCacheStrategy(DiskCacheStrategy.NONE )
+                        .skipMemoryCache(true).into(profilePicture);
             }
         } else {
             menu.findItem(R.id.nav_login).setVisible(true);
@@ -272,12 +299,13 @@ public class MainActivity extends AppCompatActivity
             menu.findItem(R.id.nav_ad).setVisible(false);
             menu.findItem(R.id.nav_upgrade).setVisible(false);
             try{
-                premuimStar.setVisibility(View.GONE);
+                premiumStar.setVisibility(View.GONE);
             }catch (Exception e){
                 Log.e("MainActivityUpdateUI",e.getMessage());
             }
             tvUsername.setText("Hand2Hand");
             tvEmail.setText("Welcome visitor!");
+            profilePicture.setImageResource(R.mipmap.ic_launcher_round);
         }
     }
 
@@ -391,4 +419,25 @@ public class MainActivity extends AppCompatActivity
         }
         onStart();
     }
- }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    super.onActivityResult(requestCode, resultCode, data);
+    FirebaseUser user = mAuth.getCurrentUser();
+    if(user != null){
+        mStorageRef = FirebaseStorage.getInstance().getReference(user.getUid()+"/profile.jpg");
+        //Detects request codes
+        if(requestCode==GET_FROM_GALLERY && resultCode == Activity.RESULT_OK) {
+            Uri selectedImage = data.getData();
+            mStorageRef.putFile(selectedImage)
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) { }})
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {}});
+        }
+    }
+
+}
+}
