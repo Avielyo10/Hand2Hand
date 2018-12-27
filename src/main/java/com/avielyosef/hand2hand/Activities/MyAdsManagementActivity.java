@@ -83,7 +83,13 @@ public class MyAdsManagementActivity extends AppCompatActivity {
                                     } else {
                                         builder = new AlertDialog.Builder(MyAdsManagementActivity.this);
                                     }
-                                    builder.setNegativeButton("Update Ad", new DialogInterface.OnClickListener() {
+                                    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            //do nothing
+                                        }
+                                    });
+                                    builder.setPositiveButton("Update Ad", new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int which) {
                                             final EditText etTitle = (EditText) mView.findViewById(R.id.ads_man_title);
                                             final EditText etDescription = (EditText)mView.findViewById(R.id.ads_man_description);

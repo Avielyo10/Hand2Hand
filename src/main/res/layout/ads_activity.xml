@@ -72,6 +72,13 @@
                 android:layout_height="wrap_content">
 
                 <RadioButton
+                    android:id="@+id/ads_radioButton_books"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Books" />
+
+                <RadioButton
                     android:id="@+id/ads_radioButton_cars"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -79,11 +86,25 @@
                     android:text="Cars" />
 
                 <RadioButton
-                    android:id="@+id/ads_radioButton_books"
+                    android:id="@+id/radioButton3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Books" />
+                    android:text="Furniture" />
+
+                <RadioButton
+                    android:id="@+id/radioButton5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Study equipment" />
+
+                <RadioButton
+                    android:id="@+id/radioButton4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Test booklets" />
 
                 <RadioButton
                     android:id="@+id/ads_radioButton_other"
