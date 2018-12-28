@@ -6,6 +6,9 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/design_default_color_primary</item>
         <item name="colorAccent">@color/colorPrimary</item>
+        <item name="android:textColorSecondaryInverse">
+            @color/common_google_signin_btn_text_dark_focused
+        </item>
     </style>
 
     <style name="AppTheme.NoActionBar">

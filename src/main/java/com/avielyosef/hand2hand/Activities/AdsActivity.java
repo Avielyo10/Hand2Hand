@@ -3,7 +3,9 @@ package com.avielyosef.hand2hand.Activities;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -19,6 +21,8 @@ import android.widget.Toast;
 
 import com.avielyosef.hand2hand.R;
 import com.avielyosef.hand2hand.Util.Ad;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -26,21 +30,29 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.util.UUID;
 
 public class AdsActivity extends AppCompatActivity {
+
+    public static final int GET_FROM_GALLERY = 1;
     public String selection;
     private EditText etTitle;
     private EditText etDescription;
     private EditText etPrice;
     private RadioGroup radioGroup;
     private TextView tvCategory;
+    private Button uploadPic;
     private View mProgressView;
     private View mAdsForm;
+    private final String adId = randomAdId();
 
     private FirebaseAuth mAuth;
     FirebaseDatabase database = FirebaseDatabase.getInstance();
+    private StorageReference mStorageRef;
 
     /**
      * onCreate
@@ -56,6 +68,7 @@ public class AdsActivity extends AppCompatActivity {
         etDescription = (EditText) findViewById(R.id.ads_description);
         etPrice = (EditText)findViewById(R.id.ads_price);
         tvCategory = (TextView) findViewById(R.id.ads_category);
+        uploadPic = (Button) findViewById(R.id.ads_upload);
 
         radioGroup = (RadioGroup)findViewById(R.id.ads_radio_group);
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -68,13 +81,22 @@ public class AdsActivity extends AppCompatActivity {
         mProgressView = findViewById(R.id.ads_progress_bar);
         mAdsForm = findViewById(R.id.ads_form);
 
+        uploadPic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(validateFields()){
+                    startActivityForResult(new Intent(Intent.ACTION_PICK,
+                                    android.provider.MediaStore.Images.Media.INTERNAL_CONTENT_URI),
+                            GET_FROM_GALLERY);
+                }
+            }
+        });
         Button addAdBtn = (Button) findViewById(R.id.newAdBtn);
         addAdBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(validateFields()){
                     showProgress(true);
-                    final String adId = randomAdId();
                     Toast.makeText(AdsActivity.this, "Ad created successfully!",
                             Toast.LENGTH_SHORT).show();
                     // Write an Ad to the database
@@ -206,4 +228,24 @@ public class AdsActivity extends AppCompatActivity {
      * @return
      */
     public String randomAdId() { return UUID.randomUUID().toString(); }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        final FirebaseUser user = mAuth.getCurrentUser();
+        if(user != null){
+            mStorageRef = FirebaseStorage.getInstance().getReference(adId+"/ad.jpg");
+            //Detects request codes
+            if(requestCode==GET_FROM_GALLERY && resultCode == Activity.RESULT_OK) {
+                Uri selectedImage = data.getData();
+                mStorageRef.putFile(selectedImage)
+                        .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                            @Override
+                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {}})
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception exception) {}});
+            }
+        }
+    }
 }

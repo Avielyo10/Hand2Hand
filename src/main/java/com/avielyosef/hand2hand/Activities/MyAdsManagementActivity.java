@@ -1,6 +1,9 @@
 package com.avielyosef.hand2hand.Activities;
 
+import android.app.Activity;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -21,7 +24,12 @@ import android.widget.Toast;
 
 import com.avielyosef.hand2hand.R;
 import com.avielyosef.hand2hand.Util.Ad;
+import com.avielyosef.hand2hand.Util.GlideApp;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
 import com.firebase.ui.database.FirebaseListAdapter;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -29,14 +37,20 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 public class MyAdsManagementActivity extends AppCompatActivity {
 
+    public static final int GET_FROM_GALLERY = 1;
     private FirebaseListAdapter<Ad> adapter;
     private FirebaseAuth mAuth;
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
+    private StorageReference mStorageRef;
     private ListView myAds;
     public String selection;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,11 +81,16 @@ public class MyAdsManagementActivity extends AppCompatActivity {
                             TextView price = (TextView)v.findViewById(R.id.myAdsPrice);
                             ImageView myAdsEdit = (ImageView)v.findViewById(R.id.myAds_edit);
                             ImageView myAdsTrash = (ImageView)v.findViewById(R.id.myAds_trash);
-
+                            final ImageView myAdsImage = (ImageView)v.findViewById(R.id.myAdsImage);
                             title.setText(getItem(position).getTitle());
                             description.setText(getItem(position).getDescription());
                             price.setText(String.valueOf(getItem(position).getPrice()));
-
+                            mStorageRef = FirebaseStorage.getInstance().getReference(getItem(position).getAdId()+"/ad.jpg");
+                            RequestOptions options = new RequestOptions().error(R.mipmap.ic_launcher_round);
+                            GlideApp.with(MyAdsManagementActivity.this)
+                                    .load(mStorageRef)
+                                    .diskCacheStrategy(DiskCacheStrategy.NONE )
+                                    .skipMemoryCache(true).apply(options).into(myAdsImage);
                             myAdsEdit.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
@@ -85,8 +104,17 @@ public class MyAdsManagementActivity extends AppCompatActivity {
                                     }
                                     builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                                         @Override
+                                        public void onClick(DialogInterface dialog, int which) {//do nothing
+                                        }
+                                    });
+                                    builder.setNeutralButton("Upload new Photo", new DialogInterface.OnClickListener() {
+                                        @Override
                                         public void onClick(DialogInterface dialog, int which) {
-                                            //do nothing
+                                            String adId = getItem(position).getAdId();
+                                                    mStorageRef = FirebaseStorage.getInstance().getReference(adId+"/ad.jpg");
+                                                    startActivityForResult(new Intent(Intent.ACTION_PICK,
+                                                                    android.provider.MediaStore.Images.Media.INTERNAL_CONTENT_URI),
+                                                            GET_FROM_GALLERY);
                                         }
                                     });
                                     builder.setPositiveButton("Update Ad", new DialogInterface.OnClickListener() {
@@ -134,6 +162,12 @@ public class MyAdsManagementActivity extends AppCompatActivity {
                                                     dataSnapshot.child(adPosition).getRef().setValue(null);
                                                     Toast.makeText(MyAdsManagementActivity.this, "Removing Ad..",
                                                             Toast.LENGTH_SHORT).show();
+                                                    try{
+                                                        mStorageRef = FirebaseStorage.getInstance().getReference(adPosition+"/ad.jpg");
+                                                        mStorageRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                            @Override
+                                                            public void onSuccess(Void aVoid) { }});
+                                                    }catch (Exception e){}
                                                 }
                                             })
                                             .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
@@ -196,5 +230,24 @@ public class MyAdsManagementActivity extends AppCompatActivity {
 
         if(!TextUtils.isEmpty(selection)) mRef.child("category").setValue(selection);
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        final FirebaseUser user = mAuth.getCurrentUser();
+        if(user != null){
+            //Detects request codes
+            if(requestCode==GET_FROM_GALLERY && resultCode == Activity.RESULT_OK) {
+                Uri selectedImage = data.getData();
+                mStorageRef.putFile(selectedImage)
+                        .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                            @Override
+                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {}})
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception exception) {}});
+            }
+        }
     }
 }

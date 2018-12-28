@@ -125,9 +125,17 @@
                 android:singleLine="true"/>
 
             <Button
+                android:id="@+id/ads_upload"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/colorPrimary"
+                android:text="Upload Picture" />
+
+            <Button
                 android:id="@+id/newAdBtn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:backgroundTint="@color/colorPrimary"
                 android:text="Create new Ad" />
 
         </LinearLayout>

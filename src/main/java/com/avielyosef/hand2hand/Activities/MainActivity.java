@@ -30,6 +30,7 @@ import com.avielyosef.hand2hand.Util.Ad;
 import com.avielyosef.hand2hand.R;
 import com.avielyosef.hand2hand.Util.GlideApp;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -119,7 +120,13 @@ public class MainActivity extends AppCompatActivity
                         TextView tvPrice =  (TextView)view.findViewById(R.id.customPrice);
                         ImageView customStar = (ImageView)view.findViewById(R.id.customStar);
                         ImageView customResize = (ImageView)view.findViewById(R.id.custom_resize);
-
+                        final ImageView customImage = (ImageView)view.findViewById(R.id.customImage);
+                        mStorageRef = FirebaseStorage.getInstance().getReference(getItem(position).getAdId()+"/ad.jpg");
+                        RequestOptions options = new RequestOptions().error(R.mipmap.ic_launcher_round);
+                        GlideApp.with(MainActivity.this)
+                                .load(mStorageRef)
+                                .diskCacheStrategy(DiskCacheStrategy.NONE )
+                                .skipMemoryCache(true).apply(options).into(customImage);
 
                         tvTitle.setText(title);
                         tvDescription.setText(description);
@@ -155,6 +162,13 @@ public class MainActivity extends AppCompatActivity
                                         TextView tvUsername = (TextView)mView.findViewById(R.id.resize_username);
                                         ImageView phoneCall = (ImageView)mView.findViewById(R.id.resize_phonecall);
                                         ImageView sendEmail = (ImageView)mView.findViewById(R.id.resize_email);
+                                        final ImageView resizeImage = (ImageView)mView.findViewById(R.id.resize_image);
+                                        mStorageRef = FirebaseStorage.getInstance().getReference(getItem(position).getAdId()+"/ad.jpg");
+                                        RequestOptions options = new RequestOptions().error(R.mipmap.ic_launcher_round);
+                                        GlideApp.with(MainActivity.this)
+                                                .load(mStorageRef)
+                                                .diskCacheStrategy(DiskCacheStrategy.NONE )
+                                                .skipMemoryCache(true).apply(options).into(resizeImage);
 
                                         tvTitle1.setText(title);
                                         tvDescription1.setText(description);
@@ -305,6 +319,9 @@ public class MainActivity extends AppCompatActivity
             tvEmail.setText("Welcome visitor!");
             profilePicture.setImageResource(R.mipmap.ic_launcher_round);
         }
+        try{
+            adapter.notifyDataSetChanged();
+        }catch (Exception e){}
     }
 
     @Override
@@ -421,7 +438,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     super.onActivityResult(requestCode, resultCode, data);
-    FirebaseUser user = mAuth.getCurrentUser();
+    final FirebaseUser user = mAuth.getCurrentUser();
     if(user != null){
         mStorageRef = FirebaseStorage.getInstance().getReference(user.getUid()+"/profile.jpg");
         //Detects request codes
@@ -430,12 +447,11 @@ public class MainActivity extends AppCompatActivity
             mStorageRef.putFile(selectedImage)
                     .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) { }})
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) { updateUI(user);}})
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception exception) {}});
         }
     }
-
 }
 }
