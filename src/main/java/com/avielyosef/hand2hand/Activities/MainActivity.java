@@ -287,12 +287,10 @@ public class MainActivity extends AppCompatActivity
                 }
             });
             mStorageRef = FirebaseStorage.getInstance().getReference(user.getUid()+"/profile.jpg");
-            if(mStorageRef != null){
-                GlideApp.with(this)
-                        .load(mStorageRef)
-                        .diskCacheStrategy(DiskCacheStrategy.NONE )
-                        .skipMemoryCache(true).into(profilePicture);
-            }
+            GlideApp.with(this)
+                    .load(mStorageRef)
+                    .diskCacheStrategy(DiskCacheStrategy.NONE )
+                    .skipMemoryCache(true).into(profilePicture);
         } else {
             menu.findItem(R.id.nav_login).setVisible(true);
             menu.findItem(R.id.nav_logout).setVisible(false);
