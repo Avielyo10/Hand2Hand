@@ -2,3 +2,5 @@
 *.iml
 build.gradle
 google-services.json
+.directory
+proguard-rules.pro
