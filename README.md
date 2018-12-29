@@ -4,7 +4,6 @@
 
 ## University project - develop Android application.
 
----
 ### Authentication
 Using **firebase authentication** for users authentication with E-mail & password. :email: 
 
