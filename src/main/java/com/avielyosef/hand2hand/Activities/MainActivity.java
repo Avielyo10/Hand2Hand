@@ -301,10 +301,11 @@ public class MainActivity extends AppCompatActivity
                 }
             });
             mStorageRef = FirebaseStorage.getInstance().getReference(user.getUid()+"/profile.jpg");
+            RequestOptions options = new RequestOptions().error(R.mipmap.ic_launcher_round);
             GlideApp.with(this)
                     .load(mStorageRef)
-                    .diskCacheStrategy(DiskCacheStrategy.NONE )
-                    .skipMemoryCache(true).into(profilePicture);
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .skipMemoryCache(true).apply(options).into(profilePicture);
         } else {
             menu.findItem(R.id.nav_login).setVisible(true);
             menu.findItem(R.id.nav_logout).setVisible(false);

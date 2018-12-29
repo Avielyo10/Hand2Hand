@@ -124,6 +124,21 @@
                 android:maxLines="1"
                 android:singleLine="true"/>
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <ProgressBar
+                    android:id="@+id/progressBar"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:indeterminate="false"
+                    android:max="100"
+                    android:progress="0" />
+            </LinearLayout>
+
             <Button
                 android:id="@+id/ads_upload"
                 android:layout_width="match_parent"

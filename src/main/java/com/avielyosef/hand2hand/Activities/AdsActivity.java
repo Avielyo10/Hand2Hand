@@ -7,6 +7,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -49,6 +51,9 @@ public class AdsActivity extends AppCompatActivity {
     private View mProgressView;
     private View mAdsForm;
     private final String adId = randomAdId();
+    private Handler handler = new Handler();
+    private ProgressBar progressBar;
+    private int progressStatus = 0;
 
     private FirebaseAuth mAuth;
     FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -80,7 +85,7 @@ public class AdsActivity extends AppCompatActivity {
         });
         mProgressView = findViewById(R.id.ads_progress_bar);
         mAdsForm = findViewById(R.id.ads_form);
-
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
         uploadPic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -241,7 +246,28 @@ public class AdsActivity extends AppCompatActivity {
                 mStorageRef.putFile(selectedImage)
                         .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                             @Override
-                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {}})
+                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                new Thread(new Runnable() {
+                                    public void run() {
+                                        while (progressStatus < 100) {
+                                            progressStatus += 1;
+                                            // Update the progress bar and display the
+                                            //current value in the text view
+                                            handler.post(new Runnable() {
+                                                public void run() {
+                                                    progressBar.setProgress(progressStatus);
+                                                }
+                                            });
+                                            try {
+                                                // Sleep for 20 milliseconds.
+                                                Thread.sleep(20);
+                                            } catch (InterruptedException e) {
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                    }
+                                }).start();
+                            }})
                         .addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception exception) {}});
