@@ -256,6 +256,11 @@ public class AdsActivity extends AppCompatActivity {
                                             handler.post(new Runnable() {
                                                 public void run() {
                                                     progressBar.setProgress(progressStatus);
+                                                    if(progressStatus == 99){
+                                                        Toast.makeText(AdsActivity.this,
+                                                                "Picture Uploaded Successfully!",
+                                                                Toast.LENGTH_SHORT).show();
+                                                    }
                                                 }
                                             });
                                             try {
