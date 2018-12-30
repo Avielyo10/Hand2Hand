@@ -11,8 +11,11 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -82,15 +85,18 @@ public class MyAdsManagementActivity extends AppCompatActivity {
                             ImageView myAdsEdit = (ImageView)v.findViewById(R.id.myAds_edit);
                             ImageView myAdsTrash = (ImageView)v.findViewById(R.id.myAds_trash);
                             final ImageView myAdsImage = (ImageView)v.findViewById(R.id.myAdsImage);
+                            registerForContextMenu(myAdsImage);
                             title.setText(getItem(position).getTitle());
                             description.setText(getItem(position).getDescription());
                             price.setText(String.valueOf(getItem(position).getPrice()));
+
                             mStorageRef = FirebaseStorage.getInstance().getReference(getItem(position).getAdId()+"/ad.jpg");
                             RequestOptions options = new RequestOptions().error(R.mipmap.ic_launcher_round);
                             GlideApp.with(MyAdsManagementActivity.this)
                                     .load(mStorageRef)
                                     .diskCacheStrategy(DiskCacheStrategy.NONE )
                                     .skipMemoryCache(true).apply(options).into(myAdsImage);
+
                             myAdsEdit.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
@@ -243,11 +249,85 @@ public class MyAdsManagementActivity extends AppCompatActivity {
                 mStorageRef.putFile(selectedImage)
                         .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                             @Override
-                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {}})
+                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                try {
+                                    Toast.makeText(MyAdsManagementActivity.this,
+                                            "Updated successfully!",Toast.LENGTH_SHORT).show();
+                                    adapter.notifyDataSetChanged();
+                                }catch (Exception e){}
+                            }})
                         .addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception exception) {}});
             }
+        }
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        getMenuInflater().inflate(R.menu.profile_picture_menu, menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.updateProfilePic:
+//                FirebaseUser user = mAuth.getCurrentUser();
+//                if (user != null){
+//                    startActivityForResult(new Intent(Intent.ACTION_PICK,
+//                                    android.provider.MediaStore.Images.Media.INTERNAL_CONTENT_URI),
+//                            GET_FROM_GALLERY);
+//                    ImageView profilePicture = (ImageView) headerView.findViewById(R.id.profile_pic);
+//                    mStorageRef = FirebaseStorage.getInstance().getReference(user.getUid()+"/profile.jpg");
+//                    RequestOptions options = new RequestOptions().error(R.mipmap.ic_launcher_round);
+//                    GlideApp.with(this)
+//                            .load(mStorageRef)
+//                            .diskCacheStrategy(DiskCacheStrategy.NONE)
+//                            .skipMemoryCache(true).apply(options).into(profilePicture);
+//                }
+                Toast.makeText(MyAdsManagementActivity.this,"Not available right now",
+                        Toast.LENGTH_SHORT).show();
+                return true;
+            case R.id.removePrfilePic:
+//                if (mAuth.getCurrentUser() != null) {
+//                    AlertDialog.Builder builder;
+//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//                        builder = new AlertDialog.Builder(MyAdsManagementActivity.this, android.R.style.Theme_DeviceDefault_Light_Dialog_Alert);
+//                    } else {
+//                        builder = new AlertDialog.Builder(MyAdsManagementActivity.this);
+//                    }
+//                    builder.setTitle("Delete Picture")
+//                            .setMessage("Are you sure you want to remove your Ad picture?")
+//                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+//                                public void onClick(DialogInterface dialog, int which) {
+//                                    // delete from Storage
+//                                    try {
+//                                        mStorageRef = FirebaseStorage.getInstance().getReference(mAuth.getUid() + "/profile.jpg");
+//                                        mStorageRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+//                                            @Override
+//                                            public void onSuccess(Void aVoid) {
+//                                                Toast.makeText(MyAdsManagementActivity.this, "Removing Picture..",
+//                                                        Toast.LENGTH_SHORT).show();
+//                                            }
+//                                        });
+//                                    } catch (Exception e) {
+//                                    }
+//                                }
+//                            })
+//                            .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+//                                public void onClick(DialogInterface dialog, int which) {
+//                                    // do nothing
+//                                }
+//                            })
+//                            .setIcon(R.drawable.baseline_warning_black_18dp)
+//                            .show();
+//                }
+                Toast.makeText(MyAdsManagementActivity.this,"Not available right now",
+                        Toast.LENGTH_SHORT).show();
+                return true;
+            default:
+                return super.onContextItemSelected(item);
         }
     }
 }

@@ -11,6 +11,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -56,6 +57,9 @@ public class MainActivity extends AppCompatActivity
     private StorageReference mStorageRef;
     private ListView allAds;
 
+    private Menu menu;
+    private View headerView;
+
     /**
      * onCreate
      * @param savedInstanceState
@@ -87,6 +91,8 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        menu = navigationView.getMenu();
+        headerView = navigationView.getHeaderView(0);
 
         allAds  = (ListView) findViewById(R.id.All_Ads);
         setListenerOnPaidUser();
@@ -263,13 +269,11 @@ public class MainActivity extends AppCompatActivity
      * @param user
      */
     private void updateUI(final FirebaseUser user){
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        Menu menu = navigationView.getMenu();
-        View headerView = navigationView.getHeaderView(0);
         TextView tvUsername = (TextView) headerView.findViewById(R.id.nav_header_name);
         TextView tvEmail = (TextView) headerView.findViewById(R.id.nav_header_email);
         ImageView premiumStar = (ImageView) findViewById(R.id.nav_header_star);
         final ImageView profilePicture = (ImageView) headerView.findViewById(R.id.profile_pic);
+        registerForContextMenu(profilePicture);
         if (user != null){//user is logged in
             menu.findItem(R.id.nav_login).setVisible(false);
             menu.findItem(R.id.nav_logout).setVisible(true);
@@ -290,16 +294,6 @@ public class MainActivity extends AppCompatActivity
                     Log.e("MainActivityUpdateUI",e.getMessage());
                 }
             }
-            profilePicture.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (mAuth.getCurrentUser() != null){
-                        startActivityForResult(new Intent(Intent.ACTION_PICK,
-                                        android.provider.MediaStore.Images.Media.INTERNAL_CONTENT_URI),
-                                GET_FROM_GALLERY);
-                    }
-                }
-            });
             mStorageRef = FirebaseStorage.getInstance().getReference(user.getUid()+"/profile.jpg");
             RequestOptions options = new RequestOptions().error(R.mipmap.ic_launcher_round);
             GlideApp.with(this)
@@ -332,6 +326,71 @@ public class MainActivity extends AppCompatActivity
             drawer.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
+        }
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        getMenuInflater().inflate(R.menu.profile_picture_menu, menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.updateProfilePic:
+                FirebaseUser user = mAuth.getCurrentUser();
+                if (user != null){
+                    startActivityForResult(new Intent(Intent.ACTION_PICK,
+                                    android.provider.MediaStore.Images.Media.INTERNAL_CONTENT_URI),
+                            GET_FROM_GALLERY);
+                    ImageView profilePicture = (ImageView) headerView.findViewById(R.id.profile_pic);
+                    mStorageRef = FirebaseStorage.getInstance().getReference(user.getUid()+"/profile.jpg");
+                    RequestOptions options = new RequestOptions().error(R.mipmap.ic_launcher_round);
+                    GlideApp.with(this)
+                            .load(mStorageRef)
+                            .diskCacheStrategy(DiskCacheStrategy.NONE)
+                            .skipMemoryCache(true).apply(options).into(profilePicture);
+                }
+                return true;
+            case R.id.removePrfilePic:
+                if (mAuth.getCurrentUser() != null) {
+                    AlertDialog.Builder builder;
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        builder = new AlertDialog.Builder(MainActivity.this, android.R.style.Theme_DeviceDefault_Light_Dialog_Alert);
+                    } else {
+                        builder = new AlertDialog.Builder(MainActivity.this);
+                    }
+                    builder.setTitle("Delete Picture")
+                            .setMessage("Are you sure you want to remove your profile picture?")
+                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // delete from Storage
+                                    try {
+                                        mStorageRef = FirebaseStorage.getInstance().getReference(mAuth.getUid() + "/profile.jpg");
+                                        mStorageRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                Toast.makeText(MainActivity.this, "Removing Picture..",
+                                                        Toast.LENGTH_SHORT).show();
+                                                updateUI(mAuth.getCurrentUser());
+                                            }
+                                        });
+                                    } catch (Exception e) {
+                                    }
+                                }
+                            })
+                            .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // do nothing
+                                }
+                            })
+                            .setIcon(R.drawable.baseline_warning_black_18dp)
+                            .show();
+                }
+                return true;
+            default:
+                return super.onContextItemSelected(item);
         }
     }
 
@@ -448,10 +507,15 @@ public class MainActivity extends AppCompatActivity
             mStorageRef.putFile(selectedImage)
                     .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) { updateUI(user);}})
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            Toast.makeText(MainActivity.this,"Uploaded successfully!",Toast.LENGTH_SHORT).show();
+                            updateUI(user);}})
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
-                        public void onFailure(@NonNull Exception exception) {}});
+                        public void onFailure(@NonNull Exception exception) {
+                            Toast.makeText(MainActivity.this,"An error occurred while trying to update your profile picture.",Toast.LENGTH_SHORT).show();
+
+                        }});
         }
     }
 }
